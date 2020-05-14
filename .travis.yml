@@ -1,0 +1,8 @@
+language: java
+branches:
+  only:
+  - develop
+
+install: ""
+
+script: "mvn clean verify"
