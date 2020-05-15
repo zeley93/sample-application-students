@@ -1,19 +1,6 @@
-# Build
-FROM maven:3.6.3-jdk-11 AS myapp-build
-ENV MYAPP_HOME /opt/myapp
-WORKDIR $MYAPP_HOME
-COPY pom.xml .
-RUN mvn dependency:go-offline
+FROM postgres:11.6-alpine
 
-COPY src ./src
-RUN mvn package -DskipTests
+COPY 01-CreateScheme.sql /docker-entrypoint-initdb.d
+COPY 02-InsertData.sql /docker-entrypoint-initdb.d
 
-# Run
-FROM openjdk:11-jre
-ENV MYAPP_HOME /opt/myapp
-WORKDIR $MYAPP_HOME
-COPY --from=myapp-build $MYAPP_HOME/target/*.jar myapp.jar
-
-EXPOSE 8080
-
-ENTRYPOINT java -jar myapp.jar
+ENV POSTGRES_DB=db
